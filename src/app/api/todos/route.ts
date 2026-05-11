@@ -1,0 +1,12 @@
+import { NextResponse } from 'next/server';
+
+import { createClient } from '@/utils/supabase/server';
+
+export async function GET() {
+  const supabase = createClient();
+
+  const { data } = await supabase.from('todos').select('id, name');
+
+  return NextResponse.json(data ?? []);
+}
+

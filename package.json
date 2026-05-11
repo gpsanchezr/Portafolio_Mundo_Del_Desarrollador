@@ -1,0 +1,47 @@
+{
+  "name": "mundo-del-desarrollador",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "clean:next": "node -e \"['.','.next-build'].forEach(d=>{try{require('fs').rmSync(d,{recursive:true,force:true});console.log('removed',d)}catch(e){}})\" && echo done",
+    "typecheck": "tsc -p tsconfig.check.json --noEmit --incremental false",
+    "verify": "npm run typecheck"
+  },
+  "description": "Portafolio interactivo 3D RPG — Giseella Patricia Sánchez Rico",
+  "author": "Giseella Patricia Sánchez Rico",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.9 <23"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.109.2",
+    "@react-three/fiber": "^8.17.5",
+    "@react-three/rapier": "^1.4.0",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.105.4",
+    "autoprefixer": "^10.4.19",
+    "framer-motion": "^11.3.8",
+    "next": "14.2.5",
+    "postcss": "^8.4.39",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-icons": "^5.2.1",
+    "tailwindcss": "^3.4.6",
+    "three": "^0.166.1",
+    "zustand": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.5",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.166.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.5",
+    "typescript": "^5.5.4"
+  }
+}
