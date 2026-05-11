@@ -224,5 +224,5 @@ node -v   # debe ser v20.x.x
 
 ---
 
-*© 2026 Giseella Patricia Sánchez Rico — Tecnóloga ADSO-SENA · Cali, Colombia*  
+*© 2026 Giseella Patricia Sánchez Rico — Tecnóloga en Analisis y Desarrollo de Software  ·  Colombia*  
 *Hecho con flores violetas 💜 y mucho código 💻*
