@@ -98,14 +98,14 @@ function AboutSection() {
           </h3>
           <p style={{ color:'rgba(196,181,253,0.82)', lineHeight:1.75, fontSize:'0.9rem', marginBottom:14 }}>
             Soy <strong style={{color:'#86efac'}}>Giseella Patricia Sánchez Rico</strong>, Tecnóloga
-            en Análisis y Desarrollo de Software y Técnica en Programación del SENA (Cali, Colombia).
+en Análisis y Desarrollo de Software y Técnica en Programación del SENA (Barranquilla, Atlántico).
           </p>
           <p style={{ color:'rgba(196,181,253,0.72)', lineHeight:1.75, fontSize:'0.87rem', marginBottom:20 }}>
             Me apasiona crear soluciones que mezclen funcionalidad e identidad visual única.
             Especialista en Python, React, FastAPI, OpenCV y Supabase. 💜
           </p>
           <div style={{ display:'flex', flexWrap:'wrap', gap:7 }}>
-            {['📍 Cali, Colombia','🎓 SENA ADSO','💻 Full Stack','🌸 UX/UI','🤖 IA/CV'].map((t,i)=>(
+{['📍 Barranquilla, Atlántico','🎓 SENA ADSO','💻 Full Stack','🌸 UX/UI','🤖 IA/CV'].map((t,i)=>(
               <span key={i} className="skill-badge" style={{fontSize:'0.75rem'}}>{t}</span>
             ))}
           </div>

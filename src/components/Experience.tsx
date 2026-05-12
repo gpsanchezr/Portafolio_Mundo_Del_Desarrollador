@@ -154,6 +154,7 @@ export default function Experience() {
               </mesh>
             </RigidBody>
 
+
             {/* CARGA PRIORITARIA: El jugador */}
             <Suspense fallback={null}>
               <Player />
@@ -163,6 +164,7 @@ export default function Experience() {
             <Suspense fallback={null}>
               <World />
             </Suspense>
+
 
             <Suspense fallback={null}>
               <Zones />

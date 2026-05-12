@@ -6,10 +6,10 @@ import { useState } from 'react';
    TESTIMONIALS
 ══════════════════════════════════════════════════ */
 const TESTIMONIALS = [
-  { name:'Alexander Rivera',  role:'Instructor ADSO · SENA', avatar:'👨‍🏫', color:'#7c3aed', rating:5,
-    text:'Giseella demuestra capacidad excepcional para aprender y aplicar conceptos técnicos. Su portafolio 3D interactivo es evidencia de un talento muy por encima del nivel esperado.' },
-  { name:'Eleanyeris Pérez',  role:'Compañera de equipo',    avatar:'👩‍💻', color:'#be185d', rating:5,
-    text:'Trabajar con Giseella es enriquecedor. Aporta soluciones innovadoras y hace el código elegante y hermoso. Su pasión por el diseño transforma cada proyecto.' },
+  { name:'Alexander Rivera',  role:'Usuario', avatar:'👨‍🏫', color:'#7c3aed', rating:5,
+    text:'Giseella demuestra una excelente capacidad técnica y gran atención al detalle en el desarrollo de software.' },
+  { name:'Fabian Florian',  role:'Instructor Técnico',    avatar:'🤖', color:'#be185d', rating:5,
+    text:'Giseella demuestra una excelente capacidad técnica y gran atención al detalle en el desarrollo de software.' },
   { name:'Happy-Farm · Cliente', role:'Proyecto académico',  avatar:'🌾', color:'#65a30d', rating:5,
     text:'El sistema agropecuario superó expectativas. Entrega a tiempo, código limpio y el dashboard era exactamente lo que necesitábamos.' },
   { name:'Cine-Verse · Usuario', role:'Proyecto personal',   avatar:'🎬', color:'#dc2626', rating:5,
@@ -96,7 +96,7 @@ export function FooterPanel({ onClose }: { onClose: () => void }) {
       <p style={{ color:'rgba(196,181,253,0.6)', fontSize:'0.88rem', lineHeight:1.7, marginBottom:22 }}>
         Portafolio interactivo 3D RPG creado con ❤️ por<br/>
         <strong style={{color:'#f9a8d4'}}>Giseella Patricia Sánchez Rico</strong><br/>
-        Tecnóloga ADSO-SENA · Cali, Colombia
+        Tecnóloga ADSO-SENA · Barranquilla, Atlántico
       </p>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:22, textAlign:'left' }}>
         {[{l:'Framework',v:'Next.js 14'},{l:'3D Engine',v:'React Three Fiber'},{l:'Físicas',v:'@react-three/rapier'},{l:'Estado',v:'Zustand'},{l:'Backend',v:'Supabase'},{l:'Estilos',v:'Tailwind CSS'}].map(it=>(

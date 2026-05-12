@@ -39,7 +39,8 @@ export default function AboutPanel({ onClose }: { onClose: () => void }) {
           <p style={{ color:'rgba(196,181,253,0.85)', lineHeight:1.75, fontSize:'0.9rem', marginBottom:14 }}>
             Soy <strong style={{ color:'#86efac' }}>Giseella Patricia Sánchez Rico</strong>, Tecnóloga en
             Análisis y Desarrollo de Software y Técnica en Programación de Software del SENA
-            (Cali, Valle del Cauca). 💜
+            (Barranquilla, Atlántico). 💜
+
           </p>
           <p style={{ color:'rgba(196,181,253,0.78)', lineHeight:1.75, fontSize:'0.88rem', marginBottom:20 }}>
             Me apasiona crear soluciones digitales que combinen funcionalidad con identidad visual única.
@@ -48,7 +49,8 @@ export default function AboutPanel({ onClose }: { onClose: () => void }) {
 
           {/* Info chips */}
           <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:24 }}>
-            {['📍 Cali, Colombia','🎓 Aprendiz SENA','💻 Full Stack Dev','🌸 UX/UI Design','🐍 Python','⚛️ React'].map((info,i)=>(
+            {['📍 Barranquilla, Atlántico','🎓 Aprendiz SENA','💻 Full Stack Dev','🌸 UX/UI Design','🐍 Python','⚛️ React'].map((info,i)=>(
+
               <span key={i} className="skill-badge" style={{ fontSize:'0.76rem' }}>{info}</span>
             ))}
           </div>

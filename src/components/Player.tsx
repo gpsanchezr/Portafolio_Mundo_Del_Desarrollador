@@ -115,38 +115,31 @@ export default function Player() {
       return;
     }
 
-    const { forward, backward, left, right } = {
-      forward: KEYS.ArrowUp || KEYS.KeyW,
-      backward: KEYS.ArrowDown || KEYS.KeyS,
-      left: KEYS.ArrowLeft || KEYS.KeyA,
-      right: KEYS.ArrowRight || KEYS.KeyD,
-    };
-
-    // 2. Movimiento relativo a la cámara
-    const camDir = new THREE.Vector3();
-    state.camera.getWorldDirection(camDir);
-    camDir.y = 0;
-    camDir.normalize();
-
-    const camLeft = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), camDir).normalize();
-
-    const moveDir = new THREE.Vector3(0, 0, 0);
-    if (forward) moveDir.add(camDir);
-    if (backward) moveDir.sub(camDir);
-    if (left) moveDir.add(camLeft);
-    if (right) moveDir.sub(camLeft);
-
+    // 2. Movimiento (corregido: controles invertidos)
     const vel = rb.current.linvel();
+    const movement = { x: 0, z: 0 };
 
-    if (moveDir.lengthSq() > 0) {
-      moveDir.normalize();
+    if (KEYS.ArrowUp || KEYS.KeyW) movement.z -= 1;
+    if (KEYS.ArrowDown || KEYS.KeyS) movement.z += 1;
+    if (KEYS.ArrowLeft || KEYS.KeyA) movement.x -= 1;
+    if (KEYS.ArrowRight || KEYS.KeyD) movement.x += 1;
+
+    if (movement.x !== 0 || movement.z !== 0) {
+      // rotación hacia la dirección de movimiento
+      const lerpRotation = Math.atan2(movement.x, movement.z);
+      facing.current = lerpRotation;
       moving.current = true;
-      facing.current = Math.atan2(moveDir.x, moveDir.z);
-      rb.current.setLinvel({ x: moveDir.x * SPEED, y: vel.y, z: moveDir.z * SPEED }, true);
+
+      rb.current.setLinvel(
+        { x: movement.x * SPEED, y: vel.y, z: movement.z * SPEED },
+        true,
+      );
     } else {
       moving.current = false;
+      // FRENADO EN SECO: evita patinaje/temblor
       rb.current.setLinvel({ x: 0, y: vel.y, z: 0 }, true);
     }
+
 
     // 3. Seguimiento de cámara suave preservando el ángulo orbital del usuario
     if (controlsRef.current) {
@@ -171,7 +164,7 @@ export default function Player() {
         type="dynamic"
         enabledRotations={[false, false, false]}
         colliders={false}
-        linearDamping={2.5}
+        linearDamping={1.0}
       >
         <CapsuleCollider args={[0.5, 0.5]} />
         <PlayerAvatar facing={facing} moving={moving} />
