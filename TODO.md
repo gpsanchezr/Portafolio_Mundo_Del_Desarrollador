@@ -1,7 +1,7 @@
-- [ ] Revisar geometría de ruedas y rotaciones
-- [ ] Corregir animación de ruedas usando wheelRef asignado
-- [ ] Hacer movimiento del Player más robusto (setLinvel y damping)
-- [ ] Guardar cambios en src/components/Player.tsx
-- [x] Ejecutar el proyecto y validar movimiento + ruedas verticales
+# TODO
+
+## Ajuste de Desbloqueo Final: Experience.tsx
+- [x] Inspeccionar `src/components/Experience.tsx` para localizar `MagicLoader`.
+- [x] Reemplazar `MagicLoader` por la versión solicitada (con retraso de seguridad y desaparición total al terminar, sin bloquear mouse).
 
 

@@ -1,11 +1,15 @@
 'use client';
-import { useRef, useEffect } from 'react';
-import { useGLTF, useAnimations } from '@react-three/drei';
+import { useRef, useEffect, useState } from 'react';
+import { useGLTF, useAnimations, useTexture, OrbitControls } from '@react-three/drei';
 
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
+
+
+
 import { RigidBody, CapsuleCollider } from '@react-three/rapier';
 import * as THREE from 'three';
 import { useGameStore } from '@/store/useGameStore';
+
 
 function lvY(rb: any) {
   try {
@@ -14,6 +18,50 @@ function lvY(rb: any) {
     return 0;
   }
 }
+
+/* ── PLAYER AVATAR (GLTF) ───────────────────────────────────── */
+function PlayerAvatar({ facing, moving }: { facing: React.MutableRefObject<number>; moving: React.MutableRefObject<boolean>; }) {
+  const g = useRef<THREE.Group>(null);
+  const { scene, animations } = useGLTF('https://oldvgciksrwujujimepg.supabase.co/storage/v1/object/public/assets-rpg/models/characters/Avatar/ChicaVestidoRojo.glb');
+  const { actions, names } = useAnimations(animations, scene);
+  const texture = useTexture('https://oldvgciksrwujujimepg.supabase.co/storage/v1/object/public/assets-rpg/models/characters/Avatar/texture_0_0.png');
+
+  useEffect(() => {
+    texture.flipY = false;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    scene.traverse((child: any) => {
+      if (child.isMesh) {
+        child.material.map = texture;
+        child.material.needsUpdate = true;
+      }
+    });
+  }, [scene, texture]);
+
+  useFrame(() => {
+    if (!g.current) return;
+    const targetQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), facing.current);
+    g.current.quaternion.slerp(targetQuat, 0.2);
+
+    if (names.length > 0) {
+      const walkAction = actions[names[0]];
+      if (walkAction) {
+        if (moving.current) {
+          if (!walkAction.isRunning()) walkAction.reset().fadeIn(0.2).play();
+        } else {
+          walkAction.fadeOut(0.2);
+        }
+      }
+    }
+  });
+
+  return (
+    <group ref={g}>
+      <primitive object={scene} scale={[1.1, 1.1, 1.1]} position={[0, -0.9, 0]} />
+    </group>
+  );
+}
+
+
 
 /* ── KEYBOARD ────────────────────────────────────────────────── */
 const KEYS: Record<string, boolean> = {};
@@ -34,141 +82,103 @@ function useKeys() {
   }, []);
 }
 
-/* ── PLAYER AVATAR (GLTF) ───────────────────────────────────── */
-function PlayerAvatar({
-  facing,
-  moving,
-}: {
-  facing: React.MutableRefObject<number>;
-  moving: React.MutableRefObject<boolean>;
-}) {
-  const g = useRef<THREE.Group>(null);
-
-  const { scene, animations } = useGLTF(
-    'https://oldvgciksrwujujimepg.supabase.co/storage/v1/object/public/assets-rpg/models/characters/Avatar/ChicaVestidoRojo.glb'
-  );
-  const { actions, names } = useAnimations(animations, scene);
-
-  useEffect(() => {
-    // Ejecutar la animación si existe 'Walk', 'Walking' o la primera que encuentre
-    const actionName = names.find((n) => n.toLowerCase().includes('walk')) || names[0];
-    if (actionName && actions[actionName]) {
-      const action = actions[actionName];
-      // Lógica básica: si se mueve, reproduce la animación
-      if (moving.current) {
-        action.play();
-      } else {
-        action.stop(); // Opcional: cambiar a animación Idle si existe
-      }
-    }
-  }, [actions, names]);
-
-
-
-  useFrame((_, delta) => {
-    if (!g.current) return;
-
-    g.current.rotation.y = facing.current;
-
-    // Gentle breathing
-    const t = performance.now() * 0.001;
-    g.current.position.y = Math.sin(t * 1.2) * 0.02;
-
-    // (moving kept for future animations; currently no extra behavior)
-    void moving;
-    void delta;
-  });
-
-  return (
-    <group ref={g}>
-      <primitive object={scene} scale={[1.2, 1.2, 1.2]} position={[0, -0.9, 0]} />
-
-    </group>
-  );
-}
-
 /* ── PLAYER CONTROLLER ───────────────────────────────────────── */
 export default function Player() {
   const rb = useRef<any>(null);
-  const { camera } = useThree();
+  const controlsRef = useRef<any>(null);
   const setPos = useGameStore((s) => s.setPlayerPosition);
   const isUIOpen = useGameStore((s) => s.isUIOpen);
   const hasStarted = useGameStore((s) => s.hasStarted);
-
   useKeys();
 
-  const camTarget = useRef(new THREE.Vector3(0, 4, 6));
-  const lookAt = useRef(new THREE.Vector3(0, 1, 0));
   const facing = useRef(0);
   const moving = useRef(false);
+  const SPEED = 7;
+  const [cameraSetup, setCameraSetup] = useState(false);
 
-  const SPEED = 9;
-  const CAM_H = 4;
-  const CAM_D = 6;
-
-  useFrame((_, dt) => {
+  useFrame((state, delta) => {
     if (!rb.current || !hasStarted) return;
-
     const pos = rb.current.translation();
     setPos([pos.x, pos.y, pos.z]);
 
+    // 1. Configuración inicial de la cámara
+    if (!cameraSetup && controlsRef.current) {
+      state.camera.position.set(pos.x, pos.y + 4, pos.z + 8);
+      controlsRef.current.target.set(pos.x, pos.y + 1, pos.z);
+      controlsRef.current.update();
+      setCameraSetup(true);
+    }
+
     if (isUIOpen) {
       moving.current = false;
-      rb.current.setLinvel({ x: 0, y: lvY(rb.current), z: 0 }, true);
+      rb.current.setLinvel({ x: 0, y: rb.current.linvel().y, z: 0 }, true);
       return;
     }
 
-    let mx = 0;
-    let mz = 0;
-    if (KEYS.ArrowUp || KEYS.KeyW) mz -= 1;
-    if (KEYS.ArrowDown || KEYS.KeyS) mz += 1;
-    if (KEYS.ArrowLeft || KEYS.KeyA) mx -= 1;
-    if (KEYS.ArrowRight || KEYS.KeyD) mx += 1;
+    const { forward, backward, left, right } = {
+      forward: KEYS.ArrowUp || KEYS.KeyW,
+      backward: KEYS.ArrowDown || KEYS.KeyS,
+      left: KEYS.ArrowLeft || KEYS.KeyA,
+      right: KEYS.ArrowRight || KEYS.KeyD,
+    };
 
-    const dir = new THREE.Vector3(mx, 0, mz);
-    if (dir.lengthSq() > 0) {
-      dir.normalize();
+    // 2. Movimiento relativo a la cámara
+    const camDir = new THREE.Vector3();
+    state.camera.getWorldDirection(camDir);
+    camDir.y = 0;
+    camDir.normalize();
+
+    const camLeft = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), camDir).normalize();
+
+    const moveDir = new THREE.Vector3(0, 0, 0);
+    if (forward) moveDir.add(camDir);
+    if (backward) moveDir.sub(camDir);
+    if (left) moveDir.add(camLeft);
+    if (right) moveDir.sub(camLeft);
+
+    const vel = rb.current.linvel();
+
+    if (moveDir.lengthSq() > 0) {
+      moveDir.normalize();
       moving.current = true;
-      facing.current = Math.atan2(dir.x, dir.z);
+      facing.current = Math.atan2(moveDir.x, moveDir.z);
+      rb.current.setLinvel({ x: moveDir.x * SPEED, y: vel.y, z: moveDir.z * SPEED }, true);
     } else {
       moving.current = false;
+      rb.current.setLinvel({ x: 0, y: vel.y, z: 0 }, true);
     }
 
-    const velocity = rb.current.linvel();
-    rb.current.setLinvel(
-      {
-        x: dir.x * SPEED,
-        y: velocity.y,
-        z: dir.z * SPEED
-      },
-      true
-    );
-
-    // Camera follow
-    const a = facing.current + Math.PI;
-    camTarget.current.set(
-      pos.x + Math.sin(a) * CAM_D,
-      pos.y + CAM_H,
-      pos.z + Math.cos(a) * CAM_D
-    );
-    lookAt.current.set(pos.x, pos.y + 1, pos.z);
-    camera.position.lerp(camTarget.current, dt * 3.5);
-    camera.lookAt(lookAt.current);
+    // 3. Seguimiento de cámara suave preservando el ángulo orbital del usuario
+    if (controlsRef.current) {
+      const playerTarget = new THREE.Vector3(pos.x, pos.y + 1, pos.z);
+      const diff = new THREE.Vector3().subVectors(playerTarget, controlsRef.current.target);
+      state.camera.position.add(diff);
+      controlsRef.current.target.copy(playerTarget);
+      controlsRef.current.update();
+    }
   });
 
   return (
-    <RigidBody
-      ref={rb}
-      position={[0, 1.2, 0]}
-      type="dynamic"
-      enabledRotations={[false, true, false]}
-      colliders={false}
-      linearDamping={2.5}
-      angularDamping={2.5}
-    >
-      <CapsuleCollider args={[0.5, 0.5]} />
-      <PlayerAvatar facing={facing} moving={moving} />
-    </RigidBody>
+    <>
+      <OrbitControls ref={controlsRef} makeDefault enablePan={false} minDistance={3} maxDistance={15} maxPolarAngle={Math.PI / 2 - 0.1} />
+
+
+
+
+      <RigidBody
+        ref={rb}
+        position={[0, 1.2, 0]}
+        type="dynamic"
+        enabledRotations={[false, false, false]}
+        colliders={false}
+        linearDamping={2.5}
+      >
+        <CapsuleCollider args={[0.5, 0.5]} />
+        <PlayerAvatar facing={facing} moving={moving} />
+      </RigidBody>
+    </>
   );
 }
+
+
 
